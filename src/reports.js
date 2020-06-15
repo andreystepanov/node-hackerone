@@ -466,7 +466,7 @@ const getRecent = async ({
   }
 
   return {
-    reports: [...list, ...rest],
+    reports: list,
     has_more,
     cursor,
   }
