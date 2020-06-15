@@ -1,4 +1,4 @@
-export reports from './reports'
+import reports from './reports'
 
 export default {
   reports,
