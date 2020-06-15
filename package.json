@@ -1,0 +1,44 @@
+{
+  "name": "node-hackerone",
+  "version": "1.0.0",
+  "description": "HackerOne API for NodeJS",
+  "main": "dist/index.js",
+  "scripts": {
+    "release": "np",
+    "test": "./node_modules/.bin/jest src/*",
+    "test:watch": "npm run test -- --watch",
+    "build": "npm run prettier && ./node_modules/.bin/babel src -d dist --ignore 'src/*.test.js'",
+    "prepublish": "npm run build",
+    "prettier": "./node_modules/.bin/prettier --config ./.prettierrc --write src/index.js"
+  },
+  "author": "Andrey Stepanov <code@andrey.co> (https://andrey.co/)",
+  "bugs": {
+    "url": "https://github.com/andreystepanov/node-hackerone/issues"
+  },
+  "homepage": "https://github.com/andreystepanov/node-hackerone",
+  "keywords": [
+    "hackerone",
+    "h1",
+    "api",
+    "nodejs",
+    "node",
+    "bugbounty",
+    "reports",
+    "bounty"
+  ],
+  "dependencies": {
+    "axios": "^0.19.2",
+    "lodash": "^4.17.15",
+    "moment": "^2.26.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.10.1",
+    "@babel/core": "^7.10.2",
+    "@babel/plugin-proposal-export-default-from": "^7.10.1",
+    "@babel/preset-env": "^7.10.2",
+    "babel-loader": "^8.1.0",
+    "jest": "^26.0.1",
+    "np": "^6.2.4",
+    "prettier": "^2.0.5"
+  }
+}
