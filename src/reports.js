@@ -442,7 +442,10 @@ const getRecent = async ({
             : 0,
         )
         .filter(report => report.node.disclosed_at !== last)
-        .map(({ node }) => node)
+        .map(({ node }) => ({
+          ...node,
+          id: Number(node.id),
+        }))
 
       return {
         list: items,
@@ -453,12 +456,20 @@ const getRecent = async ({
     .catch(({ data }) => {})
 
   if (all && has_more && after) {
-    const rest = await getRecent({ last, limit, cursor: after })
+    const { list: rest } = await getRecent({ last, limit, cursor: after })
 
-    return [...list, ...rest]
+    return {
+      reports: [...list, ...rest],
+      has_more: false,
+      cursor: null,
+    }
   }
 
-  return list
+  return {
+    reports: [...list, ...rest],
+    has_more,
+    cursor,
+  }
 }
 
 const getRecentReports = async options => {

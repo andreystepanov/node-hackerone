@@ -425,7 +425,9 @@ const getRecent = async ({
     } = response;
     const items = reports.sort((a, b) => a.node.disclosed_at < b.node.disclosed_at ? -1 : a.node.disclosed_at > b.node.disclosed_at ? 1 : 0).filter(report => report.node.disclosed_at !== last).map(({
       node
-    }) => node);
+    }) => ({ ...node,
+      id: Number(node.id)
+    }));
     return {
       list: items,
       has_more: pageInfo.hasNextPage || false,
@@ -436,15 +438,25 @@ const getRecent = async ({
   }) => {});
 
   if (all && has_more && after) {
-    const rest = await getRecent({
+    const {
+      list: rest
+    } = await getRecent({
       last,
       limit,
       cursor: after
     });
-    return [...list, ...rest];
+    return {
+      reports: [...list, ...rest],
+      has_more: false,
+      cursor: null
+    };
   }
 
-  return list;
+  return {
+    reports: [...list, ...rest],
+    has_more,
+    cursor
+  };
 };
 
 const getRecentReports = async options => {
