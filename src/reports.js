@@ -15,11 +15,9 @@ export const toUnix = str => {
 }
 
 export const fromUnix = date => {
-  if (typeof date === 'string' && date.indexOf('1') != 0) {
-    return date
-  }
-
-  return moment(Number(date)).format('YYYY-MM-DDTHH:mm:ss.SSSZ')
+  return moment(typeof date === 'string' ? date : Number(date)).format(
+    'YYYY-MM-DDTHH:mm:ss.SSSZ',
+  )
 }
 
 export const format = data => {
@@ -392,7 +390,7 @@ const getActionChanges = ({ additional_data, ...action }) => {
 const getRecent = async ({
   last,
   headers = null,
-  limit = -1,
+  limit = 25,
   cursor = null,
 } = {}) => {
   const disclosed_at = last ? fromUnix(last) : null
@@ -402,7 +400,7 @@ const getRecent = async ({
   const url = `${baseUrl}/graphql`
   const data = {
     variables: {
-      count,
+      count: count > 100 ? 100 : count,
       ...(disclosed_at && {
         disclosed_at,
       }),
@@ -414,7 +412,9 @@ const getRecent = async ({
       cursor ? ', $cursor: String' : ''
     }) { reports( ${
       cursor ? 'after: $cursor,' : ''
-    } first: $count, order_by:{ field: disclosed_at, direction: ASC}, where:{ disclosed_at: { _gt: $disclosed_at } } ) { edges { node { id: _id title disclosed_at } } pageInfo { endCursor hasNextPage } } }`,
+    } first: $count, order_by:{ field: disclosed_at, direction: ${
+      disclosed_at ? 'ASC' : 'DESC'
+    }}, where:{ disclosed_at: { _gt: $disclosed_at } } ) { edges { node { id: _id title disclosed_at } } pageInfo { endCursor hasNextPage } } }`,
   }
   const config = {
     headers: {

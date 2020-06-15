@@ -28,11 +28,7 @@ const toUnix = str => {
 exports.toUnix = toUnix;
 
 const fromUnix = date => {
-  if (typeof date === 'string' && date.indexOf('1') != 0) {
-    return date;
-  }
-
-  return (0, _moment.default)(Number(date)).format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+  return (0, _moment.default)(typeof date === 'string' ? date : Number(date)).format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 };
 
 exports.fromUnix = fromUnix;
@@ -386,7 +382,7 @@ const getActionChanges = ({
 const getRecent = async ({
   last,
   headers = null,
-  limit = -1,
+  limit = 25,
   cursor = null
 } = {}) => {
   const disclosed_at = last ? fromUnix(last) : null;
@@ -395,7 +391,7 @@ const getRecent = async ({
   const url = `${baseUrl}/graphql`;
   const data = {
     variables: {
-      count,
+      count: count > 100 ? 100 : count,
       ...(disclosed_at && {
         disclosed_at
       }),
@@ -403,7 +399,7 @@ const getRecent = async ({
         cursor
       })
     },
-    query: `query GetReports($disclosed_at: DateTime, $count: Int${cursor ? ', $cursor: String' : ''}) { reports( ${cursor ? 'after: $cursor,' : ''} first: $count, order_by:{ field: disclosed_at, direction: ASC}, where:{ disclosed_at: { _gt: $disclosed_at } } ) { edges { node { id: _id title disclosed_at } } pageInfo { endCursor hasNextPage } } }`
+    query: `query GetReports($disclosed_at: DateTime, $count: Int${cursor ? ', $cursor: String' : ''}) { reports( ${cursor ? 'after: $cursor,' : ''} first: $count, order_by:{ field: disclosed_at, direction: ${disclosed_at ? 'ASC' : 'DESC'}}, where:{ disclosed_at: { _gt: $disclosed_at } } ) { edges { node { id: _id title disclosed_at } } pageInfo { endCursor hasNextPage } } }`
   };
   const config = {
     headers: {
