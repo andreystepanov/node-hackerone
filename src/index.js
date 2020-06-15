@@ -1,5 +1,5 @@
-import { format } from './reports'
+export reports from './reports'
 
 export default {
-  format,
+  reports,
 }
