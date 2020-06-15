@@ -19,4 +19,4 @@ node_modules/
 .eslintcache
 # dotenv environment variables file
 .env
-dist/
+dist
