@@ -387,8 +387,7 @@ const getRecent = async ({
   last,
   headers = null,
   limit = -1,
-  cursor = null,
-  simple = false
+  cursor = null
 } = {}) => {
   const disclosed_at = last ? fromUnix(last) : null;
   const all = limit < 0;
@@ -449,7 +448,7 @@ const getRecent = async ({
     return [...list, ...rest];
   }
 
-  return simple ? list.map(report => format(report)) : list;
+  return list;
 };
 
 const getRecentReports = async options => {
