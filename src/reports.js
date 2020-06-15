@@ -398,6 +398,7 @@ const getRecent = async ({
   const count = all ? 100 : limit
 
   const url = `${baseUrl}/graphql`
+  const direction = disclosed_at ? 'ASC' : 'DESC'
   const data = {
     variables: {
       count: count > 100 ? 100 : count,
@@ -412,9 +413,7 @@ const getRecent = async ({
       cursor ? ', $cursor: String' : ''
     }) { reports( ${
       cursor ? 'after: $cursor,' : ''
-    } first: $count, order_by:{ field: disclosed_at, direction: ${
-      disclosed_at ? 'ASC' : 'DESC'
-    }}, where:{ disclosed_at: { _gt: $disclosed_at } } ) { edges { node { id: _id title disclosed_at } } pageInfo { endCursor hasNextPage } } }`,
+    } first: $count, order_by:{ field: disclosed_at, direction: ${direction}}, where:{ disclosed_at: { _gt: $disclosed_at } } ) { edges { node { id: _id title disclosed_at } } pageInfo { endCursor hasNextPage } } }`,
   }
   const config = {
     headers: {
@@ -424,7 +423,7 @@ const getRecent = async ({
     },
   }
 
-  const { list, has_more, cursor: after } = await axios
+  const { list, error, has_more, cursor: after } = await axios
     .post(url, data, config)
     .then(({ data: response }) => {
       const {
@@ -453,20 +452,26 @@ const getRecent = async ({
         cursor: pageInfo.endCursor || null,
       }
     })
-    .catch(({ data }) => {})
+    .catch(({ data }) => ({
+      list: [],
+      has_more: false,
+      cursor: null,
+      error: true,
+      details: data,
+    }))
 
-  if (all && has_more && after) {
+  if (!error && all && has_more && after) {
     const { list: rest } = await getRecent({ last, limit, cursor: after })
 
     return {
-      reports: [...list, ...rest],
+      reports: [...list, ...rest].reverse(),
       has_more: false,
       cursor: null,
     }
   }
 
   return {
-    reports: list,
+    reports: list.reverse(),
     has_more,
     cursor: after,
   }
