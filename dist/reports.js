@@ -149,7 +149,7 @@ const format = data => {
     substate,
     summaries,
     visibility,
-    cve_ids = null
+    cve_ids
   } = data;
   const author_type = severity && severity.author_type ? severity.author_type : null;
   const {
@@ -420,12 +420,6 @@ const format = data => {
 
   if (isIBB) {
     json.program.ibb = true;
-  }
-
-  if (json.award) {
-    // report.a = json.award.total_amount
-    report.b = json.award.total_amount;
-    report.bb = json.award.bonus_amount;
   }
 
   return json;
