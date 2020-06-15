@@ -37,84 +37,6 @@ const fromUnix = date => {
 
 exports.fromUnix = fromUnix;
 
-const getRecent = async ({
-  last,
-  limit = -1,
-  cursor = null
-}) => {
-  const disclosed_at = last ? fromUnix(last) : null;
-  const all = limit < 0;
-  const count = all ? 100 : limit;
-  const url = `${baseUrl}/graphql`;
-  const data = {
-    variables: {
-      count,
-      ...(disclosed_at && {
-        disclosed_at
-      }),
-      ...(cursor && {
-        cursor
-      })
-    },
-    query: `query GetReports($disclosed_at: DateTime, $count: Int${cursor ? ', $cursor: String' : ''}) { reports( ${cursor ? 'after: $cursor,' : ''} first: $count, order_by:{ field: disclosed_at, direction: ASC}, where:{ disclosed_at: { _gt: $disclosed_at } } ) { edges { node { id: _id title disclosed_at } } pageInfo { endCursor hasNextPage } } }`
-  };
-  const config = {
-    headers: {
-      'User-Agent': 'bugbounty.app/0.1',
-      'x-auth-token': '----'
-    }
-  };
-  const {
-    list,
-    has_more,
-    cursor: after
-  } = await _axios.default.post(url, data, config).then(({
-    data: response
-  }) => {
-    const {
-      data: {
-        reports: {
-          edges: reports,
-          pageInfo
-        }
-      }
-    } = response;
-    const items = reports.sort((a, b) => a.node.disclosed_at < b.node.disclosed_at ? -1 : a.node.disclosed_at > b.node.disclosed_at ? 1 : 0).filter(report => report.node.disclosed_at !== last).map(({
-      node
-    }) => node);
-    return {
-      list: items,
-      has_more: pageInfo.hasNextPage || false,
-      cursor: pageInfo.endCursor || null
-    };
-  }).catch(({
-    data
-  }) => {});
-
-  if (all && has_more && after) {
-    const rest = await getRecent({
-      last,
-      limit,
-      cursor: after
-    });
-    return [...list, ...rest];
-  }
-
-  return list;
-};
-
-const getRecentReports = async options => {
-  return await getRecent(options);
-};
-
-const getReport = async id => {
-  return await _axios.default.get(`${baseUrl}/reports/${id}.json`).then(({
-    data
-  }) => data).catch(({
-    status
-  }) => null);
-};
-
 const format = data => {
   const {
     id,
@@ -459,6 +381,87 @@ const getActionChanges = ({
   }
 
   return Object.keys(changes).length > 0 ? changes : null;
+};
+
+const getRecent = async ({
+  last,
+  headers = null,
+  limit = -1,
+  cursor = null,
+  simple = false
+} = {}) => {
+  const disclosed_at = last ? fromUnix(last) : null;
+  const all = limit < 0;
+  const count = all ? 100 : limit;
+  const url = `${baseUrl}/graphql`;
+  const data = {
+    variables: {
+      count,
+      ...(disclosed_at && {
+        disclosed_at
+      }),
+      ...(cursor && {
+        cursor
+      })
+    },
+    query: `query GetReports($disclosed_at: DateTime, $count: Int${cursor ? ', $cursor: String' : ''}) { reports( ${cursor ? 'after: $cursor,' : ''} first: $count, order_by:{ field: disclosed_at, direction: ASC}, where:{ disclosed_at: { _gt: $disclosed_at } } ) { edges { node { id: _id title disclosed_at } } pageInfo { endCursor hasNextPage } } }`
+  };
+  const config = {
+    headers: {
+      'User-Agent': 'node-hackerone/0.1',
+      ...headers,
+      'x-auth-token': '----'
+    }
+  };
+  const {
+    list,
+    has_more,
+    cursor: after
+  } = await _axios.default.post(url, data, config).then(({
+    data: response
+  }) => {
+    const {
+      data: {
+        reports: {
+          edges: reports,
+          pageInfo
+        }
+      }
+    } = response;
+    const items = reports.sort((a, b) => a.node.disclosed_at < b.node.disclosed_at ? -1 : a.node.disclosed_at > b.node.disclosed_at ? 1 : 0).filter(report => report.node.disclosed_at !== last).map(({
+      node
+    }) => node);
+    return {
+      list: items,
+      has_more: pageInfo.hasNextPage || false,
+      cursor: pageInfo.endCursor || null
+    };
+  }).catch(({
+    data
+  }) => {});
+
+  if (all && has_more && after) {
+    const rest = await getRecent({
+      last,
+      limit,
+      cursor: after
+    });
+    return [...list, ...rest];
+  }
+
+  return simple ? list.map(report => format(report)) : list;
+};
+
+const getRecentReports = async options => {
+  return await getRecent(options);
+};
+
+const getReport = async (id, simple = false) => {
+  return await _axios.default.get(`${baseUrl}/reports/${id}.json`).then(({
+    data
+  }) => simple ? format(data) : data).catch(({
+    status
+  }) => null);
 };
 
 var _default = {
