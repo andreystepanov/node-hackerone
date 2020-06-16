@@ -1,6 +1,6 @@
 {
   "name": "node-hackerone",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "HackerOne API for NodeJS",
   "main": "dist/index.js",
   "scripts": {
