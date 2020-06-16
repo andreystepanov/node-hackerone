@@ -380,7 +380,7 @@ const getActionChanges = ({
 };
 
 const getRecent = async ({
-  last,
+  after: last,
   headers = null,
   limit = 25,
   cursor = null,

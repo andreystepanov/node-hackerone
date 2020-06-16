@@ -388,7 +388,7 @@ const getActionChanges = ({ additional_data, ...action }) => {
 }
 
 const getRecent = async ({
-  last,
+  after: last,
   headers = null,
   limit = 25,
   cursor = null,
