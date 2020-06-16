@@ -383,13 +383,14 @@ const getRecent = async ({
   last,
   headers = null,
   limit = 25,
-  cursor = null
+  cursor = null,
+  order = 'desc'
 } = {}) => {
   const disclosed_at = last ? fromUnix(last) : null;
   const all = limit < 0;
   const count = all ? 100 : limit;
   const url = `${baseUrl}/graphql`;
-  const direction = disclosed_at ? 'ASC' : 'DESC';
+  const direction = order.toUpperCase();
   const data = {
     variables: {
       count: count > 100 ? 100 : count,
@@ -454,14 +455,14 @@ const getRecent = async ({
       cursor: after
     });
     return {
-      reports: [...list, ...rest].reverse(),
+      reports: [...list, ...rest],
       has_more: false,
       cursor: null
     };
   }
 
   return {
-    reports: list.reverse(),
+    reports: list,
     has_more,
     cursor: after
   };
