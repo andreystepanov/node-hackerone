@@ -390,7 +390,8 @@ const getRecent = async ({
   headers = null,
   limit = 25,
   cursor = null,
-  order = 'desc'
+  order = 'desc',
+  debug = false
 } = {}) => {
   const last = lastDate ? fromUnix(lastDate) : null;
   const disclosed_at = last;
@@ -416,6 +417,18 @@ const getRecent = async ({
       'User-Agent': 'node-hackerone/0.1',
       ...headers,
       'x-auth-token': '----'
+    }
+  };
+  const debugInfo = {
+    options: {
+      limit,
+      order,
+      after: last,
+      cursor
+    },
+    request: {
+      config,
+      data
     }
   };
   const {
@@ -445,7 +458,13 @@ const getRecent = async ({
       node
     }) => ({ ...node,
       id: Number(node.id)
-    })).filter(report => report.disclosed_at > last);
+    })).filter(report => {
+      if (!last) {
+        return true;
+      }
+
+      return report.disclosed_at !== last;
+    });
     return {
       list: items,
       has_more: pageInfo.hasNextPage || false,
@@ -458,7 +477,10 @@ const getRecent = async ({
     has_more: false,
     cursor: null,
     error: true,
-    details: data
+    details: data,
+    ...(debug && {
+      debug_information: debugInfo
+    })
   }));
 
   if (!error && all && has_more && after) {
@@ -472,14 +494,20 @@ const getRecent = async ({
     return {
       reports: [...list, ...rest],
       has_more: false,
-      cursor: null
+      cursor: null,
+      ...(debug && {
+        debug_information: debugInfo
+      })
     };
   }
 
   return {
     reports: list,
     has_more,
-    cursor: has_more ? after : null
+    cursor: has_more ? after : null,
+    ...(debug && {
+      debug_information: debugInfo
+    })
   };
 };
 

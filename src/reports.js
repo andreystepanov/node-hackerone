@@ -397,6 +397,7 @@ const getRecent = async ({
   limit = 25,
   cursor = null,
   order = 'desc',
+  debug = false,
 } = {}) => {
   const last = lastDate ? fromUnix(lastDate) : null
   const disclosed_at = last
@@ -430,6 +431,19 @@ const getRecent = async ({
     },
   }
 
+  const debugInfo = {
+    options: {
+      limit,
+      order,
+      after: last,
+      cursor,
+    },
+    request: {
+      config,
+      data,
+    },
+  }
+
   const { list, error, has_more, cursor: after } = await axios
     .post(url, data, config)
     .then(({ data: response }) => {
@@ -452,7 +466,13 @@ const getRecent = async ({
           ...node,
           id: Number(node.id),
         }))
-        .filter(report => report.disclosed_at > last)
+        .filter(report => {
+          if (!last) {
+            return true
+          }
+
+          return report.disclosed_at !== last
+        })
 
       return {
         list: items,
@@ -466,6 +486,7 @@ const getRecent = async ({
       cursor: null,
       error: true,
       details: data,
+      ...(debug && { debug_information: debugInfo }),
     }))
 
   if (!error && all && has_more && after) {
@@ -475,6 +496,7 @@ const getRecent = async ({
       reports: [...list, ...rest],
       has_more: false,
       cursor: null,
+      ...(debug && { debug_information: debugInfo }),
     }
   }
 
@@ -482,6 +504,7 @@ const getRecent = async ({
     reports: list,
     has_more,
     cursor: has_more ? after : null,
+    ...(debug && { debug_information: debugInfo }),
   }
 }
 
