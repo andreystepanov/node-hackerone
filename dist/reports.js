@@ -391,6 +391,7 @@ const getRecent = async ({
   const count = all ? 100 : limit;
   const url = `${baseUrl}/graphql`;
   const direction = order.toUpperCase();
+  const desc = direction === 'DESC';
   const data = {
     variables: {
       count: count > 100 ? 100 : count,
@@ -425,8 +426,15 @@ const getRecent = async ({
           pageInfo
         }
       }
-    } = response;
-    const items = reports.sort((a, b) => a.node.disclosed_at < b.node.disclosed_at ? -1 : a.node.disclosed_at > b.node.disclosed_at ? 1 : 0).filter(report => report.node.disclosed_at !== last).map(({
+    } = response; // .sort((a, b) =>
+    //   a.node.disclosed_at < b.node.disclosed_at
+    //     ? -1
+    //     : a.node.disclosed_at > b.node.disclosed_at
+    //     ? 1
+    //     : 0,
+    // )
+
+    const items = reports.filter(report => report.node.disclosed_at !== last).map(({
       node
     }) => ({ ...node,
       id: Number(node.id)
