@@ -31,7 +31,7 @@ const fromUnix = date => {
   const momentDate = (0, _moment.default)(typeof date === 'string' ? date : Number(date));
 
   if (date && momentDate.isValid()) {
-    return momentDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+    return momentDate.utc().format('YYYY-MM-DDTHH:mm:ss.SSS\\Z');
   }
 
   return null;

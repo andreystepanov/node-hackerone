@@ -18,7 +18,7 @@ export const fromUnix = date => {
   const momentDate = moment(typeof date === 'string' ? date : Number(date))
 
   if (date && momentDate.isValid()) {
-    return momentDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ')
+    return momentDate.utc().format('YYYY-MM-DDTHH:mm:ss.SSS\\Z')
   }
 
   return null
