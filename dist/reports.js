@@ -28,7 +28,13 @@ const toUnix = str => {
 exports.toUnix = toUnix;
 
 const fromUnix = date => {
-  return (0, _moment.default)(typeof date === 'string' ? date : Number(date)).format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+  const momentDate = (0, _moment.default)(typeof date === 'string' ? date : Number(date));
+
+  if (date && momentDate.isValid()) {
+    return momentDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+  }
+
+  return null;
 };
 
 exports.fromUnix = fromUnix;
@@ -380,13 +386,14 @@ const getActionChanges = ({
 };
 
 const getRecent = async ({
-  after: last,
+  after: lastDate,
   headers = null,
   limit = 25,
   cursor = null,
   order = 'desc'
 } = {}) => {
-  const disclosed_at = last ? fromUnix(last) : null;
+  const last = lastDate ? fromUnix(lastDate) : null;
+  const disclosed_at = last;
   const all = limit < 0;
   const count = all ? 100 : limit;
   const url = `${baseUrl}/graphql`;
@@ -434,11 +441,11 @@ const getRecent = async ({
     //     : 0,
     // )
 
-    const items = reports.filter(report => report.node.disclosed_at !== last).map(({
+    const items = reports.map(({
       node
     }) => ({ ...node,
       id: Number(node.id)
-    }));
+    })).filter(report => report.disclosed_at > last);
     return {
       list: items,
       has_more: pageInfo.hasNextPage || false,

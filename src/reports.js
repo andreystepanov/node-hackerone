@@ -15,9 +15,13 @@ export const toUnix = str => {
 }
 
 export const fromUnix = date => {
-  return moment(typeof date === 'string' ? date : Number(date)).format(
-    'YYYY-MM-DDTHH:mm:ss.SSSZ',
-  )
+  const momentDate = moment(typeof date === 'string' ? date : Number(date))
+
+  if (date && momentDate.isValid()) {
+    return momentDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ')
+  }
+
+  return null
 }
 
 export const format = data => {
@@ -388,13 +392,14 @@ const getActionChanges = ({ additional_data, ...action }) => {
 }
 
 const getRecent = async ({
-  after: last,
+  after: lastDate,
   headers = null,
   limit = 25,
   cursor = null,
   order = 'desc',
 } = {}) => {
-  const disclosed_at = last ? fromUnix(last) : null
+  const last = lastDate ? fromUnix(lastDate) : null
+  const disclosed_at = last
   const all = limit < 0
   const count = all ? 100 : limit
 
@@ -443,11 +448,11 @@ const getRecent = async ({
       // )
 
       const items = reports
-        .filter(report => report.node.disclosed_at !== last)
         .map(({ node }) => ({
           ...node,
           id: Number(node.id),
         }))
+        .filter(report => report.disclosed_at > last)
 
       return {
         list: items,
