@@ -146,17 +146,17 @@ const reports = async ({
   };
 };
 
-const report = async (id, simple = false) => {
-  return id ? await _axios.default.get(`${baseUrl}/reports/${Number(id)}.json`).then(({
+const report = async (id, options) => {
+  const reportId = id ? Number(id) : null;
+  return reportId && reportId > 0 ? await _axios.default.get(`${baseUrl}/reports/${reportId}.json`).then(({
     data
-  }) => simple ? format(data) : data).catch(({
+  }) => options ? format(data, oprions) : data).catch(({
     status
   }) => null) : null;
 };
 
 var _default = {
   list: reports,
-  get: report,
-  format
+  get: report
 };
 exports.default = _default;
