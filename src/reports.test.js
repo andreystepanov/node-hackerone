@@ -1,6 +1,6 @@
-import hackerone from './'
+import hackerone, { format } from './'
 const {
-  reports: { list, get, format },
+  reports: { list, get },
 } = hackerone
 
 describe('get', () => {
