@@ -118,7 +118,7 @@ const reports = async ({
   if (!error && all && has_more && after) {
     const {
       list: rest
-    } = await getRecent({
+    } = await reports({
       last,
       limit,
       cursor: after

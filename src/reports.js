@@ -102,7 +102,7 @@ const reports = async ({
     }))
 
   if (!error && all && has_more && after) {
-    const { list: rest } = await getRecent({ last, limit, cursor: after })
+    const { list: rest } = await reports({ last, limit, cursor: after })
 
     return {
       reports: [...list, ...rest],
