@@ -74,7 +74,7 @@ const reports = async ({
     const {
       data: {
         reports: {
-          edges: reports,
+          edges: hoReports,
           pageInfo
         }
       }
@@ -86,7 +86,7 @@ const reports = async ({
     //     : 0,
     // )
 
-    const items = reports.map(({
+    const items = hoReports.map(({
       node
     }) => ({ ...node,
       id: Number(node.id)

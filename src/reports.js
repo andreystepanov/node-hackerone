@@ -61,7 +61,7 @@ const reports = async ({
     .then(({ data: response }) => {
       const {
         data: {
-          reports: { edges: reports, pageInfo },
+          reports: { edges: hoReports, pageInfo },
         },
       } = response
 
@@ -73,7 +73,7 @@ const reports = async ({
       //     : 0,
       // )
 
-      const items = reports
+      const items = hoReports
         .map(({ node }) => ({
           ...node,
           id: Number(node.id),
