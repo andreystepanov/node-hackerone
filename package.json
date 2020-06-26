@@ -28,7 +28,7 @@
   ],
   "dependencies": {
     "axios": "^0.19.2",
-    "hackerone-report-formatter": "0.0.1",
+    "hackerone-report-formatter": "0.0.6",
     "lodash": "^4.17.15",
     "moment": "^2.26.0"
   },
