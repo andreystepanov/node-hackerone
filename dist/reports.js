@@ -150,7 +150,7 @@ const report = async (id, options) => {
   const reportId = id ? Number(id) : null;
   return reportId && reportId > 0 ? await _axios.default.get(`${baseUrl}/reports/${reportId}.json`).then(({
     data
-  }) => options ? format(data, oprions) : data).catch(({
+  }) => options ? format(data, options) : data).catch(({
     status
   }) => null) : null;
 };

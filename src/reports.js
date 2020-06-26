@@ -132,7 +132,7 @@ const report = async (id, options) => {
   return reportId && reportId > 0
     ? await axios
         .get(`${baseUrl}/reports/${reportId}.json`)
-        .then(({ data }) => (options ? format(data, oprions) : data))
+        .then(({ data }) => (options ? format(data, options) : data))
         .catch(({ status }) => null)
     : null
 }
