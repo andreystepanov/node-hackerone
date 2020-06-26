@@ -127,11 +127,12 @@ const reports = async ({
   }
 }
 
-const report = async (id, simple = false) => {
-  return id
+const report = async (id, options) => {
+  const reportId = id ? Number(id) : null
+  return reportId && reportId > 0
     ? await axios
-        .get(`${baseUrl}/reports/${Number(id)}.json`)
-        .then(({ data }) => (simple ? format(data) : data))
+        .get(`${baseUrl}/reports/${reportId}.json`)
+        .then(({ data }) => (options ? format(data, oprions) : data))
         .catch(({ status }) => null)
     : null
 }
@@ -139,5 +140,4 @@ const report = async (id, simple = false) => {
 export default {
   list: reports,
   get: report,
-  format,
 }
