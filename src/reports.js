@@ -1,5 +1,7 @@
 import axios from 'axios'
-import format, { formatDate } from 'hackerone-report-formatter'
+import formatReport, { formatDate } from 'hackerone-report-formatter'
+
+export const format = formatReport
 
 const baseUrl = 'https://hackerone.com'
 
@@ -102,7 +104,12 @@ const reports = async ({
     }))
 
   if (!error && all && has_more && after) {
-    const { list: rest } = await reports({ last, limit, cursor: after })
+    // console.log('requesting mode reports...')
+    const { reports: rest } = await reports({
+      after: last,
+      limit,
+      cursor: after,
+    })
 
     return {
       reports: [...list, ...rest],

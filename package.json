@@ -6,6 +6,8 @@
   "scripts": {
     "release": "np",
     "build": "npm run prettier && ./node_modules/.bin/babel src -d dist --ignore 'src/*.test.js'",
+    "test": "./node_modules/.bin/jest src/*",
+    "test:watch": "npm run test -- --watch",
     "prepublish": "npm run build",
     "prettier": "./node_modules/.bin/prettier --config ./.prettierrc --write src"
   },

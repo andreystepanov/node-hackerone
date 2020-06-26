@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = void 0;
+exports.default = exports.format = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
@@ -15,6 +15,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+const format = _hackeroneReportFormatter.default;
+exports.format = format;
 const baseUrl = 'https://hackerone.com';
 
 const reports = async ({
@@ -116,10 +118,11 @@ const reports = async ({
   }));
 
   if (!error && all && has_more && after) {
+    // console.log('requesting mode reports...')
     const {
-      list: rest
+      reports: rest
     } = await reports({
-      last,
+      after: last,
       limit,
       cursor: after
     });
@@ -146,7 +149,7 @@ const reports = async ({
 const report = async (id, simple = false) => {
   return id ? await _axios.default.get(`${baseUrl}/reports/${Number(id)}.json`).then(({
     data
-  }) => simple ? (0, _hackeroneReportFormatter.default)(data) : data).catch(({
+  }) => simple ? format(data) : data).catch(({
     status
   }) => null) : null;
 };
@@ -154,6 +157,6 @@ const report = async (id, simple = false) => {
 var _default = {
   list: reports,
   get: report,
-  format: _hackeroneReportFormatter.default
+  format
 };
 exports.default = _default;
